@@ -1,77 +1,83 @@
 import { useState } from "react";
-import "./App.css"
 import axios from "axios";
 
-function App(){
+function App() {
+  const [empregado, setEmpregado] = useState({
+    nome: "",
+    idade: 0,
+    pais: "",
+    cargo: "",
+    salario: 0.0,
+  });
 
-  const [nome,setNome] = useState("");
-  const [idade,setIdade] = useState(0);
-  const [pais,setPais] = useState("");
-  const [cargo,setCargo] = useState("");
-  const [salario,setSalario] = useState(0.00);
+  const [listaEmpregados, setListaEmpregados] = useState([]);
 
-   const adicionarEmpregado = () =>{
-      axios.post("http://localhost:5050/create", {nome: nome, idade: idade, pais: pais,
-       cargo: cargo, salario: salario}).then(() => {
-        console.log("Sucesso")
-       })
-   }
-
-  const mostrarInformacoes = () =>{
-    console.log("Nome:",nome);
-    console.log("Idade:",idade);
-    console.log("País",pais);
-    console.log("Cargo:",cargo);
-    console.log("Salário:",salario);
-  }
-
-  return(
-    <div className="App">
-      <div className="Informacao">
-        <label>Nome</label>
-        <input onChange={(event) => {
-          setNome(event.target.value);
-        }} type="text" />
+  const adicionarEmpregado = () => {
+    axios
+      .post("http://localhost:5000/create", empregado)
+      .then(() => {
+        console.log("Sucesso");
         
-        <label >Idade</label>
-        <input onChange={(event) => {
-          setIdade(event.target.value);
-        }} type="number"/>
+        // Limpe cada campo de entrada individualmente
+        const inputFields = document.querySelectorAll('input');
+        inputFields.forEach(input => {
+          input.value = "";
+        });
+      });
+  };
+    
+  
+
+  const listarEmpregados = () => {
+    axios.get("http://localhost:5000/empregados").then((response) => {
+      setListaEmpregados(response.data);
+    });
+  };
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setEmpregado({ ...empregado, [name]: value });
+    console.log(empregado.nome)
+  };
+
+  return (
+    <>
+      <div className="informacoes">
+        <label>Nome</label>
+        <input name="nome" onChange={handleChange} type="text" />
+
+        <label>Idade</label>
+        <input name="idade" onChange={handleChange} type="number" />
 
         <label>País</label>
-        <input onChange={(event) => {
-          setPais(event.target.value);
-        }} type="text" />
+        <input name="pais" onChange={handleChange} type="text" />
 
         <label>Cargo</label>
-        <input onChange={(event) => {
-          setCargo(event.target.value);
-        }} type="text" />
+        <input name="cargo" onChange={handleChange} type="text" />
 
         <label>Salário</label>
-        <input onChange={(event) => {
-          setSalario(event.target.value);
-        }} type="number"/>
+        <input name="salario" onChange={handleChange} type="number" />
 
-        <button onClick={adicionarEmpregado}>Adicionar Empregado</button>
+        <button onClick={adicionarEmpregado}>Adicionar</button>
       </div>
-    
-    </div>
+
+      <hr />
+      <div className="mostrar">
+        <button onClick={listarEmpregados}>Mostrar empregados</button>
+        {listaEmpregados.map((val, key) => {
+          return (
+            <div className="card" key={key}>
+              <div>
+                <p>{val.nome}</p>
+                <p>{val.cargo}</p>
+                <p>{val.salario}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </>
   );
 }
 
-
-
 export default App;
-
-
-  // const [count,setCount] = useState(0);
-
-  // const IncrementCount = () =>{
-  //   setCount(count + 1);
-  // };
-
-  // <div className="contador">
-  //     <h1>{count}</h1>
-  //     <button onClick={IncrementCount}>Increment</button>
-  //   </div>

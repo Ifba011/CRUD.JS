@@ -1,0 +1,58 @@
+.informacoes{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+button{
+  cursor: pointer;
+}
+
+.informacoes input{
+  width: 300px;
+  height: 20px;
+  margin-bottom: 15px;
+}
+
+.informacoes button{
+  width: 200px;
+  height: 50px;
+}
+
+.mostrar{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.mostrar button{
+  width: 200px;
+  height: 50px;
+}
+
+.card{
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  padding: 0;
+  margin: 0;
+  justify-content: center;
+  
+}
+
+.card div{
+  display: flex;
+  flex-direction: column;
+  margin-top: 30px;
+  align-items: center;
+  background-color: azure;
+  border: 1px solid black;
+
+}
+
+.card p{
+  padding: 0px;
+  margin: 0;
+}
