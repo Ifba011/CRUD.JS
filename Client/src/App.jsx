@@ -1,81 +1,98 @@
-import { useState } from "react";
-import axios from "axios";
+import { useState } from 'react';
+import './App.css';
+import axios from 'axios';
 
 function App() {
-  const [empregado, setEmpregado] = useState({
-    nome: "",
-    idade: 0,
-    pais: "",
-    cargo: "",
-    salario: 0.0,
+  const [listaProdutos, setListaProdutos] = useState([]);
+  const [produtos, setProdutos] = useState({
+    nome: '',
+    valor: 0.00,
+    quantidade: 0,
   });
-
-  const [listaEmpregados, setListaEmpregados] = useState([]);
-
-  const adicionarEmpregado = () => {
-    axios
-      .post("http://localhost:5000/create", empregado)
-      .then(() => {
-        console.log("Sucesso");
-        
-        // Limpe cada campo de entrada individualmente
-        const inputFields = document.querySelectorAll('input');
-        inputFields.forEach(input => {
-          input.value = "";
-        });
-      });
-  };
-    
-  
-
-  const listarEmpregados = () => {
-    axios.get("http://localhost:5000/empregados").then((response) => {
-      setListaEmpregados(response.data);
-    });
-  };
+  const [busca, setBusca] = useState('');
+  const [buscaPorNome, setBuscaPorNome] = useState('');
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setEmpregado({ ...empregado, [name]: value });
-    console.log(empregado.nome)
+    setProdutos({ ...produtos, [name]: value });
+
+  };
+
+
+  const saveInfo = () => {
+    if (produtos.nome.trim() === '' || produtos.quantidade === 0 || produtos.valor === 0) {
+      alert('Preencha todos os campos corretamente');
+    } else {
+      // Verifica se o produto já existe com base no nome
+      axios
+        .get(`http://localhost:5000/buscar?nome=${produtos.nome}`)
+        .then((response) => {
+          if (response.data.length > 0) {
+            alert('Este produto já existe!');
+          } else {
+            // Se o produto não existe, então você pode salvá-lo
+            axios
+              .post('http://localhost:5000/salvar', produtos)
+              .then(() => {
+                console.log('Sucesso');
+              });
+          }
+        });
+    }
+  };
+  
+  const getInfo = () =>{
+    axios
+    .get('http://localhost:5000/buscar')   
+    .then((response) =>{
+      setListaProdutos(response.data);
+    })
+  }
+  const searchByName = () => {
+    axios
+      .get(`http://localhost:5000/buscar?nome=${buscaPorNome}`)
+      .then((response) => {
+        setListaProdutos(response.data);
+      });
   };
 
   return (
     <>
-      <div className="informacoes">
+      <div>
         <label>Nome</label>
         <input name="nome" onChange={handleChange} type="text" />
-
-        <label>Idade</label>
-        <input name="idade" onChange={handleChange} type="number" />
-
-        <label>País</label>
-        <input name="pais" onChange={handleChange} type="text" />
-
-        <label>Cargo</label>
-        <input name="cargo" onChange={handleChange} type="text" />
-
-        <label>Salário</label>
-        <input name="salario" onChange={handleChange} type="number" />
-
-        <button onClick={adicionarEmpregado}>Adicionar</button>
       </div>
 
-      <hr />
-      <div className="mostrar">
-        <button onClick={listarEmpregados}>Mostrar empregados</button>
-        {listaEmpregados.map((val, key) => {
-          return (
-            <div className="card" key={key}>
-              <div>
-                <p>{val.nome}</p>
-                <p>{val.cargo}</p>
-                <p>{val.salario}</p>
-              </div>
-            </div>
-          );
-        })}
+      <div>
+        <label>Valor</label>
+        <input type="number" onChange={handleChange} name="valor" />
       </div>
+
+      <div>
+        <label>Quantidade</label>
+        <input type="number" onChange={handleChange} name="quantidade" />
+      </div>
+
+      <div>
+        <label>Buscar Produto por Nome</label>
+        <input
+          type="text"
+          onChange={(e) => setBuscaPorNome(e.target.value)}
+          value={buscaPorNome}
+        />
+        <button onClick={searchByName}>BUSCAR POR NOME</button>
+      </div>
+
+      <button onClick={saveInfo}>SALVAR</button>
+      <button onClick={getInfo}>MOSTRAR</button>
+
+      {listaProdutos.map((val, key) => {
+        return (
+          <div key={key}>
+            <p>{val.nome}</p>
+          </div>
+        );
+      })}
     </>
   );
 }
