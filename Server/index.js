@@ -25,7 +25,7 @@ App.post('/salvar',(req,res)  =>{
         }
 
         else{
-            res.send(console.log('Sucesso'))
+            res.send('Sucesso')
         }
     })
 })

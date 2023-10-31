@@ -1,83 +1,81 @@
 import { useState } from "react";
 import axios from "axios";
+import './App.css'
 
 function App() {
-  const [empregado, setEmpregado] = useState({
-    nome: "",
-    idade: 0,
-    pais: "",
-    cargo: "",
-    salario: 0.0,
-  });
-
-  const [listaEmpregados, setListaEmpregados] = useState([]);
-
-  const adicionarEmpregado = () => {
-    axios
-      .post("http://localhost:5000/create", empregado)
-      .then(() => {
-        console.log("Sucesso");
-        
-        // Limpe cada campo de entrada individualmente
-        const inputFields = document.querySelectorAll('input');
-        inputFields.forEach(input => {
-          input.value = "";
-        });
-      });
-  };
-    
   
+  const [produto,setProduto] = useState({
+    nome: '',
+    valor: 0.00,
+    quantidade: 0
+  })
 
-  const listarEmpregados = () => {
-    axios.get("http://localhost:5000/empregados").then((response) => {
-      setListaEmpregados(response.data);
-    });
-  };
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setEmpregado({ ...empregado, [name]: value });
-    console.log(empregado.nome)
-  };
+
+  const salvar = () =>{
+    const dados = ({
+      nome: document.getElementById('inpNome').value,
+      valor: document.getElementById('inpValor').value,
+      quantidade: document.getElementById('inpQuantidade').value,
+
+    })
+
+    setProduto(dados);
+
+    axios
+    .post('http://localhost:5000/salvar', produto)
+    .then((response) =>{console.log(response.data)})
+  }
+
+  const buscar  = () =>{
+    axios
+    .get('http://localhost:5000/buscar')
+    .then((response) => {
+      const dadosRecebidos = ({
+        nome: response.data[0].nome,
+        valor: response.data[0].valor,
+        quantidade: response.data[0].quantidade,
+      })
+            
+
+
+      
+
+    })
+  }
+
+  // const handleChange = (event) => {
+  //   const { name, value } = event.target;
+  //   setEmpregado({ ...empregado, [name]: value });
+  //   console.log(empregado.nome)
+  // };
 
   return (
     <>
-      <div className="informacoes">
-        <label>Nome</label>
-        <input name="nome" onChange={handleChange} type="text" />
-
-        <label>Idade</label>
-        <input name="idade" onChange={handleChange} type="number" />
-
-        <label>País</label>
-        <input name="pais" onChange={handleChange} type="text" />
-
-        <label>Cargo</label>
-        <input name="cargo" onChange={handleChange} type="text" />
-
-        <label>Salár.io</label>
-        <input name="salario" onChange={handleChange} type="number" />
-
-        <button onClick={adicionarEmpregado}>Adicionar</button>
+      <div>
+        <label>Nome:</label>
+        <input type="text" id="inpNome" />
       </div>
 
-      <hr />
-      <div className="mostrar">
-        <button onClick={listarEmpregados}>Mostrar empregados</button>
-        {listaEmpregados.map((val, key) => {
-          return (
-            <div className="card" key={key}>
-              <div>
-                <p>{val.nome}</p>
-                <p>{val.cargo}</p>
-                <p>{val.salario}</p>
-              </div>
-            </div>
-          );
-        })}
+      <div>
+        <label>Valor:</label>
+        <input type="number" id="inpValor"/>
       </div>
+
+      <div>
+        <label>Quantidade:</label>
+        <input type="number" id="inpQuantidade" />
+      </div>
+      
+      <div>
+        <button onClick={salvar}>Salvar</button>
+        <button onClick={buscar}>Buscar</button>
+        <button onClick={() =>{console.log(produto.nome)}}>teste</button>
+      </div>
+
+      <h1>{produto.nome}</h1>
     </>
   );
-}
 
+};
 export default App;
